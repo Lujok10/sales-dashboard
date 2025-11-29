@@ -6,43 +6,44 @@ export default function LoginPage() {
   const [form, setForm] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
   const handleLogin = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const response = await api.post("/auth/login", form, {
-        validateStatus: () => true,
-      });
+  try {
+    const response = await api.post("/auth/login", form, {
+      validateStatus: () => true,
+    });
 
-      if (response.status !== 200) {
-        alert("Login failed: " + response.data);
-        return;
-      }
-
-      const roleMatch = response.data.match(/as (MANAGER|RECEPTION|ADMIN)/);
-      if (!roleMatch) {
-        alert("Login successful, but role not recognized.");
-        return;
-      }
-
-      const role = roleMatch[1];
-
-      localStorage.setItem("username", form.username);
-      localStorage.setItem("role", role);
-      window.dispatchEvent(new Event("roleChanged"));
-
-      alert(`Welcome ${form.username}! You are logged in as ${role}.`);
-
-      if (role === "MANAGER" || role === "ADMIN") navigate("/managerDashboard");
-      else navigate("/salesDashboard");
-    } catch (err) {
-      console.error(err);
-      alert("Error connecting to server.");
+    if (response.status !== 200) {
+      alert("Login failed: " + response.data);
+      return;
     }
-  };
+
+    const roleMatch = response.data.match(/as (MANAGER|RECEPTION|ADMIN)/);
+    if (!roleMatch) {
+      alert("Login successful, but role not recognized.");
+      return;
+    }
+
+    const role = roleMatch[1];
+
+    localStorage.setItem("username", form.username);
+    localStorage.setItem("role", role);
+    window.dispatchEvent(new Event("roleChanged"));
+
+    alert(`Welcome ${form.username}! You are logged in as ${role}.`);
+
+    if (role === "MANAGER" || role === "ADMIN") {
+      navigate("/");                // ✅ Manager → root → ManagerDashboard
+    } else {
+      navigate("/salesDashboard");  // ✅ Reception → SalesDashboard
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error connecting to server.");
+  }
+};
+
 
   return (
     <div className="container vh-100 d-flex justify-content-center align-items-center bg-light">

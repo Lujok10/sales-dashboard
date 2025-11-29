@@ -15,15 +15,17 @@ export default function Register() {
     const role = localStorage.getItem("role");
     console.log("Register guard – role:", role);
 
+    // Not logged in at all
     if (!role) {
       alert("Please log in as a manager first.");
-      navigate("/loginPage");
+      navigate("/loginPage");   // ✅ match App.js route
       return;
     }
 
+    // Logged in but not manager
     if (role !== "MANAGER") {
       alert("Only managers can create new user accounts.");
-      navigate("/");
+      navigate("/");            // ✅ send them back to dashboard
     }
   }, [navigate]);
 
@@ -35,7 +37,7 @@ export default function Register() {
     try {
       await api.post("/auth/register", form);
       alert("Registration successful. Please login.");
-      navigate("/loginPage");
+      navigate("/loginPage");   // ✅ match your login route
     } catch (err) {
       console.error(err);
       alert("Registration failed");
