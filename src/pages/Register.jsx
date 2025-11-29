@@ -13,9 +13,17 @@ export default function Register() {
   // Only MANAGER can access this page
   useEffect(() => {
     const role = localStorage.getItem("role");
-    if (!role || role !== "MANAGER") {
+    console.log("Register guard – role:", role);
+
+    if (!role) {
+      alert("Please log in as a manager first.");
+      navigate("/loginPage");
+      return;
+    }
+
+    if (role !== "MANAGER") {
       alert("Only managers can create new user accounts.");
-      navigate("/login");
+      navigate("/");
     }
   }, [navigate]);
 
@@ -27,7 +35,7 @@ export default function Register() {
     try {
       await api.post("/auth/register", form);
       alert("Registration successful. Please login.");
-      navigate("/login");
+      navigate("/loginPage");
     } catch (err) {
       console.error(err);
       alert("Registration failed");
@@ -98,7 +106,7 @@ export default function Register() {
         <div className="text-center mt-3">
           <small>
             Already registered?{" "}
-            <a href="/login" className="text-decoration-none text-primary">
+            <a href="/loginPage" className="text-decoration-none text-primary">
               Login
             </a>
           </small>
