@@ -1,5 +1,4 @@
 
-
 import {
   BrowserRouter as Router,
   Routes,
@@ -107,8 +106,7 @@ function App() {
                   </li>
                 </>
               )}
-               
-                
+
               {role === "RECEPTION" && (
                 <>
                   <li className="nav-item">
