@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 
@@ -11,6 +10,15 @@ export default function Register() {
   });
   const navigate = useNavigate();
 
+  // Only MANAGER can access this page
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    if (!role || role !== "MANAGER") {
+      alert("Only managers can create new user accounts.");
+      navigate("/login");
+    }
+  }, [navigate]);
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -20,14 +28,18 @@ export default function Register() {
       await api.post("/auth/register", form);
       alert("Registration successful. Please login.");
       navigate("/login");
-    } catch {
+    } catch (err) {
+      console.error(err);
       alert("Registration failed");
     }
   };
 
   return (
     <div className="container vh-100 d-flex justify-content-center align-items-center bg-light">
-      <div className="card shadow p-4" style={{ maxWidth: "400px", width: "100%" }}>
+      <div
+        className="card shadow p-4"
+        style={{ maxWidth: "400px", width: "100%" }}
+      >
         <div className="text-center mb-4">
           <img
             src="/logo.gif"
@@ -95,4 +107,3 @@ export default function Register() {
     </div>
   );
 }
-
