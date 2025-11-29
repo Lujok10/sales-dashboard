@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/client"; // ✅ single axios import
+import api from "../api"; // ✅ single axios import
 
 export default function LoginPage() {
   const [form, setForm] = useState({ username: "", password: "" });
