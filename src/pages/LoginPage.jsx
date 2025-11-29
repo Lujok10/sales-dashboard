@@ -90,12 +90,7 @@ export default function LoginPage() {
         </form>
 
         <div className="text-center mt-3">
-          <small>
-            Don't have an account?{" "}
-            <a href="/register" className="text-decoration-none text-primary">
-              Register
-            </a>
-          </small>
+         
         </div>
       </div>
     </div>

@@ -1,14 +1,17 @@
-// src/api/index.js
-import axios from "axios";
 
-const api = axios.create({
-  baseURL: "https://plankton-app-wycb9.ondigitalocean.app/api",
-});
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-api.interceptors.request.use((config) => {
-  config.headers["X-User-Role"] = localStorage.getItem("role") || "GUEST";
-  config.headers["X-Username"] = localStorage.getItem("username") || "anonymous";
-  return config;
-});
+// Set default role for testing
+// if (!localStorage.getItem("role")) {
+//   localStorage.setItem("role", "MANAGER"); // or "STAFF"
+// }
 
-export default api;  // 🔥 THIS IS CRITICAL
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);

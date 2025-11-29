@@ -23,249 +23,186 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Register from "./pages/Register";
 
-// function App() {
-//   const location = useLocation();
-//   const [role, setRole] = useState(localStorage.getItem("role") || "");
-  
-//   // tenant state with setTenant
-//   const [tenant, setTenant] = useState({ companyName: "NSAA Systems" });
-
-//   // Sync role across tabs + login/logout
-//   useEffect(() => {
-//     const syncRole = () => setRole(localStorage.getItem("role") || "");
-//     window.addEventListener("roleChanged", syncRole);
-//     window.addEventListener("storage", syncRole);
-//     return () => {
-//       window.removeEventListener("roleChanged", syncRole);
-//       window.removeEventListener("storage", syncRole);
-//     };
-//   }, []);
-
-//   // Update tenant after login (listen for custom event)
-//   useEffect(() => {
-//     const handleTenantUpdate = (e) => {
-//       const newTenant = e.detail?.tenant;
-//       if (newTenant) setTenant(newTenant);
-//     };
-//     window.addEventListener("tenantChanged", handleTenantUpdate);
-//     return () => window.removeEventListener("tenantChanged", handleTenantUpdate);
-//   }, []);
-
-//   // Hide header/footer/sidebar on auth pages
-//   const authPages = ["/loginPage", "/register"];
-//   const isAuthPage = authPages.includes(location.pathname);
-
-//   const sidebarTitle = `${tenant?.companyName || "NSAA Systems"} Dashboard`;
-
-//   return (
-//     <>
-//       {!isAuthPage && <Header tenant={tenant} title={role ? `${role} Dashboard` : ""} />}
-
-//       <div className="d-flex vh-100">
-//         {!isAuthPage && role && (
-//           <div className="bg-dark text-white p-3" style={{ width: "250px" }}>
-//             <h4>{sidebarTitle}</h4>
-//             <ul className="nav flex-column mt-4">
-//               <li className="nav-item">
-//                 <Link to="/" className="nav-link text-white">
-//                   🏠 Dashboard
-//                 </Link>
-//               </li>
-
-//               {role === "MANAGER" && (
-//                 <>
-//                   <li className="nav-item">
-//                     <Link to="/inventory" className="nav-link text-white">
-//                       📦 Inventory
-//                     </Link>
-//                   </li>
-//                   <li className="nav-item">
-//                     <Link to="/salesList" className="nav-link text-white">
-//                       📑 Sales List
-//                     </Link>
-//                   </li>
-//                   <li className="nav-item">
-//                     <Link to="/reportPage" className="nav-link text-white">
-//                       📊 Profit Report
-//                     </Link>
-//                   </li>
-//                   <li className="nav-item">
-//                     <Link to="/saleForm" className="nav-link text-white">
-//                       ➕ Record Sale
-//                     </Link>
-//                   </li>
-//                   <li className="nav-item">
-//                     <Link to="/itemPage" className="nav-link text-white">
-//                       🛒 Item Page
-//                     </Link>
-//                   </li>
-//                   <li className="nav-item">
-//                     <Link to="/settings" className="nav-link text-white">
-//                       ⚙️ Settings
-//                     </Link>
-//                   </li>
-//                 </>
-//               )}
-
-//               {role === "RECEPTION" && (
-//                 <>
-//                   <li className="nav-item">
-//                     <Link to="/salesDashboard" className="nav-link text-white">
-//                       🛒 Sales Dashboard
-//                     </Link>
-//                   </li>
-//                   <li className="nav-item">
-//                     <Link to="/saleForm" className="nav-link text-white">
-//                       ➕ Record Sale
-//                     </Link>
-//                   </li>
-//                   <li className="nav-item">
-//                     <Link to="/easyManageSales" className="nav-link text-white">
-//                       💰 Easy Manage Sales
-//                     </Link>
-//                   </li>
-//                   <li className="nav-item">
-//                     <Link to="/settings" className="nav-link text-white">
-//                       ⚙️ Settings
-//                     </Link>
-//                   </li>
-//                 </>
-//               )}
-
-//               <li className="nav-item">
-//                 <Link
-//                   to="/loginPage"
-//                   className="nav-link text-white"
-//                   onClick={() => {
-//                     localStorage.clear();
-//                     setRole("");
-//                     setTenant({ companyName: "NSAA Systems" }); // reset to default
-//                     window.dispatchEvent(new Event("roleChanged"));
-//                   }}
-//                 >
-//                   🔑 Logout
-//                 </Link>
-//               </li>
-//             </ul>
-//           </div>
-//         )}
-
-//         <div className="flex-grow-1 overflow-auto">
-//           <div className={isAuthPage ? "" : "container mt-4 mb-5"}>
-//             <Routes>
-//               <Route
-//                 path="/"
-//                 element={
-//                   role === "MANAGER" ? (
-//                     <ManagerDashboard />
-//                   ) : role === "RECEPTION" ? (
-//                     <SalesDashboard />
-//                   ) : (
-//                     <Navigate to="/loginPage" replace />
-//                   )
-//                 }
-//               />
-//               <Route path="/loginPage" element={<LoginPage setTenant={setTenant} />} />
-//               <Route path="/register" element={<Register setTenant={setTenant} />} />
-
-//               {role === "MANAGER" && (
-//                 <>
-//                   <Route path="/inventory" element={<Inventory />} />
-//                   <Route path="/salesList" element={<SalesList />} />
-//                   <Route path="/reportPage" element={<ReportPage />} />
-//                   <Route path="/saleForm" element={<SaleForm />} />
-//                   <Route path="/itemPage" element={<ItemPage />} />
-//                   <Route path="/settings" element={<Settings />} />
-//                 </>
-//               )}
-
-//               {role === "RECEPTION" && (
-//                 <>
-//                   <Route path="/salesDashboard" element={<SalesDashboard />} />
-//                   <Route path="/saleForm" element={<SaleForm />} />
-//                   <Route path="/easyManageSales" element={<EasyManageSales />} />
-//                   <Route path="/settings" element={<Settings />} />
-//                 </>
-//               )}
-
-//               <Route path="*" element={<Navigate to="/" replace />} />
-//             </Routes>
-//           </div>
-//         </div>
-//       </div>
-
-//       {!isAuthPage && <Footer tenant={tenant} />}
-//     </>
-//   );
-// }
-
-// export default function RootApp() {
-//   return (
-//     <Router>
-//       <App />
-//     </Router>
-//   );
-// }
-
-function RequireAuth({ children, allowedRoles }) {
-  const role = localStorage.getItem("role");
-
-  if (!role) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (allowedRoles && !allowedRoles.includes(role)) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-}
-
 function App() {
+  const location = useLocation();
+  const [role, setRole] = useState(localStorage.getItem("role") || "");
+  
+  // tenant state with setTenant
+  const [tenant, setTenant] = useState({ companyName: "NSAA Systems" });
+
+  // Sync role across tabs + login/logout
+  useEffect(() => {
+    const syncRole = () => setRole(localStorage.getItem("role") || "");
+    window.addEventListener("roleChanged", syncRole);
+    window.addEventListener("storage", syncRole);
+    return () => {
+      window.removeEventListener("roleChanged", syncRole);
+      window.removeEventListener("storage", syncRole);
+    };
+  }, []);
+
+  // Update tenant after login (listen for custom event)
+  useEffect(() => {
+    const handleTenantUpdate = (e) => {
+      const newTenant = e.detail?.tenant;
+      if (newTenant) setTenant(newTenant);
+    };
+    window.addEventListener("tenantChanged", handleTenantUpdate);
+    return () => window.removeEventListener("tenantChanged", handleTenantUpdate);
+  }, []);
+
+  // Hide header/footer/sidebar on auth pages
+  const authPages = ["/loginPage", "/register"];
+  const isAuthPage = authPages.includes(location.pathname);
+
+  const sidebarTitle = `${tenant?.companyName || "NSAA Systems"} Dashboard`;
+
   return (
-    <Router>
-      <Routes>
-        {/* Default route */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+    <>
+      {!isAuthPage && <Header tenant={tenant} title={role ? `${role} Dashboard` : ""} />}
 
-        {/* Auth routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/register"
-          element={
-            <RequireAuth allowedRoles={["MANAGER"]}>
-              <Register />
-            </RequireAuth>
-          }
-        />
+      <div className="d-flex vh-100">
+        {!isAuthPage && role && (
+          <div className="bg-dark text-white p-3" style={{ width: "250px" }}>
+            <h4>{sidebarTitle}</h4>
+            <ul className="nav flex-column mt-4">
+              <li className="nav-item">
+                <Link to="/" className="nav-link text-white">
+                  🏠 Dashboard
+                </Link>
+              </li>
 
-        {/* Manager dashboard */}
-        <Route
-          path="/managerDashboard"
-          element={
-            <RequireAuth allowedRoles={["MANAGER"]}>
-              <ManagerDashboard />
-            </RequireAuth>
-          }
-        />
+              {role === "MANAGER" && (
+                <>
+                  <li className="nav-item">
+                    <Link to="/inventory" className="nav-link text-white">
+                      📦 Inventory
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/salesList" className="nav-link text-white">
+                      📑 Sales List
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/reportPage" className="nav-link text-white">
+                      📊 Profit Report
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/saleForm" className="nav-link text-white">
+                      ➕ Record Sale
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/itemPage" className="nav-link text-white">
+                      🛒 Item Page
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/settings" className="nav-link text-white">
+                      ⚙️ Settings
+                    </Link>
+                  </li>
+                </>
+              )}
 
-        {/* Example: if you wire the other pages later */}
-        {/*
-        <Route
-          path="/inventory"
-          element={
-            <RequireAuth allowedRoles={["MANAGER", "RECEPTION"]}>
-              <Inventory />
-            </RequireAuth>
-          }
-        />
-        */}
+              {role === "RECEPTION" && (
+                <>
+                  <li className="nav-item">
+                    <Link to="/salesDashboard" className="nav-link text-white">
+                      🛒 Sales Dashboard
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/saleForm" className="nav-link text-white">
+                      ➕ Record Sale
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/easyManageSales" className="nav-link text-white">
+                      💰 Easy Manage Sales
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/settings" className="nav-link text-white">
+                      ⚙️ Settings
+                    </Link>
+                  </li>
+                </>
+              )}
 
-        {/* Fallback: unknown routes go to login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </Router>
+              <li className="nav-item">
+                <Link
+                  to="/loginPage"
+                  className="nav-link text-white"
+                  onClick={() => {
+                    localStorage.clear();
+                    setRole("");
+                    setTenant({ companyName: "NSAA Systems" }); // reset to default
+                    window.dispatchEvent(new Event("roleChanged"));
+                  }}
+                >
+                  🔑 Logout
+                </Link>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        <div className="flex-grow-1 overflow-auto">
+          <div className={isAuthPage ? "" : "container mt-4 mb-5"}>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  role === "MANAGER" ? (
+                    <ManagerDashboard />
+                  ) : role === "RECEPTION" ? (
+                    <SalesDashboard />
+                  ) : (
+                    <Navigate to="/loginPage" replace />
+                  )
+                }
+              />
+              <Route path="/loginPage" element={<LoginPage setTenant={setTenant} />} />
+              <Route path="/register" element={<Register setTenant={setTenant} />} />
+
+              {role === "MANAGER" && (
+                <>
+                  <Route path="/inventory" element={<Inventory />} />
+                  <Route path="/salesList" element={<SalesList />} />
+                  <Route path="/reportPage" element={<ReportPage />} />
+                  <Route path="/saleForm" element={<SaleForm />} />
+                  <Route path="/itemPage" element={<ItemPage />} />
+                  <Route path="/settings" element={<Settings />} />
+                </>
+              )}
+
+              {role === "RECEPTION" && (
+                <>
+                  <Route path="/salesDashboard" element={<SalesDashboard />} />
+                  <Route path="/saleForm" element={<SaleForm />} />
+                  <Route path="/easyManageSales" element={<EasyManageSales />} />
+                  <Route path="/settings" element={<Settings />} />
+                </>
+              )}
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </div>
+      </div>
+
+      {!isAuthPage && <Footer tenant={tenant} />}
+    </>
   );
 }
 
-export default App;
+export default function RootApp() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
