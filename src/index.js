@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";                      // ✅ import App
+import App from "./App";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// Optional: default role for testing (OK for now)
 if (!localStorage.getItem("role")) {
-  localStorage.setItem("role", "MANAGER"); // or "STAFF"
+  localStorage.setItem("role", "MANAGER");
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
