@@ -1,8 +1,6 @@
-
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api"; // Custom axios instance
+import api from "../api/client"; // ✅ single axios import
 
 export default function LoginPage() {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -34,7 +32,7 @@ export default function LoginPage() {
 
       localStorage.setItem("username", form.username);
       localStorage.setItem("role", role);
-      window.dispatchEvent(new Event("roleChanged")); // Notify app of role change
+      window.dispatchEvent(new Event("roleChanged"));
 
       alert(`Welcome ${form.username}! You are logged in as ${role}.`);
 
@@ -103,4 +101,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
