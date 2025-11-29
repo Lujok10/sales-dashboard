@@ -1,53 +1,64 @@
+// src/pages/LoginPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api"; // ✅ single axios import
+import api from "../api"; // axios instance pointing to your backend
 
 export default function LoginPage() {
   const [form, setForm] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
+  const onInputChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const handleLogin = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await api.post("/auth/login", form, {
-      validateStatus: () => true,
-    });
+    try {
+      const response = await api.post("/auth/login", form, {
+        validateStatus: () => true,
+      });
 
-    if (response.status !== 200) {
-      alert("Login failed: " + response.data);
-      return;
+      if (response.status !== 200) {
+        alert("Login failed: " + response.data);
+        return;
+      }
+
+      // Expecting responses like: "Login successful as MANAGER"
+      const roleMatch = response.data.match(/as (MANAGER|RECEPTION|ADMIN)/);
+      if (!roleMatch) {
+        alert("Login successful, but role not recognized.");
+        return;
+      }
+
+      const role = roleMatch[1];
+
+      localStorage.setItem("username", form.username);
+      localStorage.setItem("role", role);
+      window.dispatchEvent(new Event("roleChanged"));
+
+      alert(`Welcome ${form.username}! You are logged in as ${role}.`);
+
+      if (role === "MANAGER" || role === "ADMIN") {
+        navigate("/");                // Root → ManagerDashboard for MANAGER
+      } else {
+        navigate("/salesDashboard");  // Reception → SalesDashboard
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to server.");
     }
-
-    const roleMatch = response.data.match(/as (MANAGER|RECEPTION|ADMIN)/);
-    if (!roleMatch) {
-      alert("Login successful, but role not recognized.");
-      return;
-    }
-
-    const role = roleMatch[1];
-
-    localStorage.setItem("username", form.username);
-    localStorage.setItem("role", role);
-    window.dispatchEvent(new Event("roleChanged"));
-
-    alert(`Welcome ${form.username}! You are logged in as ${role}.`);
-
-    if (role === "MANAGER" || role === "ADMIN") {
-      navigate("/");                // ✅ Manager → root → ManagerDashboard
-    } else {
-      navigate("/salesDashboard");  // ✅ Reception → SalesDashboard
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Error connecting to server.");
-  }
-};
-
+  };
 
   return (
     <div className="container vh-100 d-flex justify-content-center align-items-center bg-light">
-      <div className="card shadow p-4" style={{ maxWidth: "400px", width: "100%" }}>
+      <div
+        className="card shadow p-4"
+        style={{ maxWidth: "400px", width: "100%" }}
+      >
         <div className="text-center mb-4">
           <img
             src="/logo.gif"
@@ -64,7 +75,7 @@ export default function LoginPage() {
             <input
               name="username"
               value={form.username}
-              onChange={handleChange}
+              onChange={onInputChange}
               type="text"
               className="form-control"
               placeholder="Enter username"
@@ -78,7 +89,7 @@ export default function LoginPage() {
               name="password"
               type="password"
               value={form.password}
-              onChange={handleChange}
+              onChange={onInputChange}
               className="form-control"
               placeholder="Enter password"
               required
@@ -91,7 +102,7 @@ export default function LoginPage() {
         </form>
 
         <div className="text-center mt-3">
-         
+          {/* Optional: add helper text or links here */}
         </div>
       </div>
     </div>
