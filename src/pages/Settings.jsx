@@ -1,211 +1,160 @@
-
-
-import { useState, useEffect } from "react";
-import { Navbar, Nav, Container } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+// src/pages/Settings.jsx
+import { useState } from "react";
+import api from "../api";
 
 export default function Settings() {
-  const navigate = useNavigate();
-
-  const [profile, setProfile] = useState({
-    picture: "",
-    username: "John Doe",
-    email: "john@example.com",
+  const [form, setForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
   });
 
-  const [preferences, setPreferences] = useState({
-    notifications: true,
-    darkMode: false,
-  });
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // Apply dark mode instantly
-  useEffect(() => {
-    if (preferences.darkMode) {
-      document.body.classList.add("bg-dark", "text-light");
-    } else {
-      document.body.classList.remove("bg-dark", "text-light");
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSuccessMsg("");
+    setErrorMsg("");
+
+    if (form.newPassword !== form.confirmNewPassword) {
+      setErrorMsg("New password and confirmation do not match.");
+      return;
     }
-  }, [preferences.darkMode]);
 
-  const handleProfileSave = (e) => {
-    e.preventDefault();
-    alert("Profile saved!");
+    if (!form.currentPassword || !form.newPassword) {
+      setErrorMsg("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await api.post("/auth/change-password", {
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
+
+      if (response.status === 200) {
+        setSuccessMsg("Password updated successfully.");
+        setForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmNewPassword: "",
+        });
+      } else {
+        setErrorMsg(response.data || "Failed to update password.");
+      }
+    } catch (err) {
+      console.error(err);
+      const backendMessage =
+        err.response?.data || "Error updating password. Please try again.";
+      setErrorMsg(
+        typeof backendMessage === "string"
+          ? backendMessage
+          : "Error updating password."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handlePreferencesSave = (e) => {
-    e.preventDefault();
-    alert("Preferences saved!");
-  };
-
-  const cardClass = preferences.darkMode ? "bg-secondary text-light" : "";
+  const username = localStorage.getItem("username") || "Unknown User";
+  const role = localStorage.getItem("role") || "UNKNOWN";
 
   return (
-    <>
-      {/* 🔵 SAME NAVBAR AS SALES DASHBOARD */}
-      <Navbar bg="dark" variant="dark" expand="lg">
-        <Container>
-          <Navbar.Brand>Settings</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              <Nav.Link onClick={() => navigate("/salesDashboard")}>Home</Nav.Link>
-              <Nav.Link onClick={() => navigate("/saleForm")}>Record Sale</Nav.Link>
-              <Nav.Link onClick={() => navigate("/easyManageSales")}>
-                Easy Manage Sales
-              </Nav.Link>
-              <Nav.Link onClick={() => navigate("/settings")}>Settings</Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+    <div className="container mt-4 mb-5">
+      <h2 className="mb-4">Settings</h2>
 
-      {/* 🔧 Settings Content */}
-      <div className="container my-4">
-        {/* Tabs */}
-        <ul className="nav nav-tabs mb-3" role="tablist">
-          <li className="nav-item" role="presentation">
-            <button
-              className="nav-link active"
-              id="profile-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#profile"
-              type="button"
-              role="tab"
-            >
-              <i className="bi bi-person-circle me-1"></i> Profile
-            </button>
-          </li>
-          <li className="nav-item" role="presentation">
-            <button
-              className="nav-link"
-              id="preferences-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#preferences"
-              type="button"
-              role="tab"
-            >
-              <i className="bi bi-sliders me-1"></i> Preferences
-            </button>
-          </li>
-        </ul>
+      {/* User info */}
+      <div className="mb-4">
+        <h5>Account Information</h5>
+        <p className="mb-1">
+          <strong>Username:</strong> {username}
+        </p>
+        <p>
+          <strong>Role:</strong> {role}
+        </p>
+      </div>
 
-        <div className="tab-content">
-          {/* Profile Tab */}
-          <div className="tab-pane fade show active" id="profile" role="tabpanel">
-            <div className={`card shadow-sm mb-4 ${cardClass}`}>
-              <div className="card-body">
-                <form onSubmit={handleProfileSave}>
-                  <div className="row align-items-center mb-3">
-                    <div className="col-md-4 text-center mb-3 mb-md-0">
-                      <label className="form-label d-block mb-2">Profile Picture</label>
-                      <img
-                        src={profile.picture || "https://via.placeholder.com/120"}
-                        alt="Profile"
-                        className="rounded-circle mb-2"
-                        style={{
-                          width: "120px",
-                          height: "120px",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="form-control mt-2"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () =>
-                              setProfile({ ...profile, picture: reader.result });
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
-                    </div>
+      {/* Change Password Card */}
+      <div className="card shadow-sm" style={{ maxWidth: "500px" }}>
+        <div className="card-body">
+          <h5 className="card-title mb-3">Change Password</h5>
+          <p className="text-muted">
+            Update your password. You will need your current password to confirm
+            this change.
+          </p>
 
-                    <div className="col-md-8">
-                      <div className="mb-3">
-                        <label className="form-label">Username</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={profile.username}
-                          onChange={(e) =>
-                            setProfile({ ...profile, username: e.target.value })
-                          }
-                          required
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">Email</label>
-                        <input
-                          type="email"
-                          className="form-control"
-                          value={profile.email}
-                          onChange={(e) =>
-                            setProfile({ ...profile, email: e.target.value })
-                          }
-                          required
-                        />
-                      </div>
-                      <button type="submit" className="btn btn-primary">
-                        Save Profile
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
+          {successMsg && (
+            <div className="alert alert-success" role="alert">
+              {successMsg}
             </div>
-          </div>
-
-          {/* Preferences Tab */}
-          <div className="tab-pane fade" id="preferences" role="tabpanel">
-            <div className={`card shadow-sm mb-4 ${cardClass}`}>
-              <div className="card-body">
-                <form onSubmit={handlePreferencesSave}>
-                  <div className="form-check mb-3">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id="notifications"
-                      checked={preferences.notifications}
-                      onChange={(e) =>
-                        setPreferences({
-                          ...preferences,
-                          notifications: e.target.checked,
-                        })
-                      }
-                    />
-                    <label className="form-check-label" htmlFor="notifications">
-                      Enable Notifications
-                    </label>
-                  </div>
-
-                  <div className="form-check mb-3">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id="darkMode"
-                      checked={preferences.darkMode}
-                      onChange={(e) =>
-                        setPreferences({ ...preferences, darkMode: e.target.checked })
-                      }
-                    />
-                    <label className="form-check-label" htmlFor="darkMode">
-                      Enable Dark Mode (Live)
-                    </label>
-                  </div>
-
-                  <button type="submit" className="btn btn-success">
-                    Save Preferences
-                  </button>
-                </form>
-              </div>
+          )}
+          {errorMsg && (
+            <div className="alert alert-danger" role="alert">
+              {errorMsg}
             </div>
-          </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label">Current Password</label>
+              <input
+                type="password"
+                name="currentPassword"
+                className="form-control"
+                value={form.currentPassword}
+                onChange={handleChange}
+                placeholder="Enter current password"
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">New Password</label>
+              <input
+                type="password"
+                name="newPassword"
+                className="form-control"
+                value={form.newPassword}
+                onChange={handleChange}
+                placeholder="Enter new password"
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmNewPassword"
+                className="form-control"
+                value={form.confirmNewPassword}
+                onChange={handleChange}
+                placeholder="Re-enter new password"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? "Updating..." : "Update Password"}
+            </button>
+          </form>
         </div>
       </div>
-    </>
+    </div>
   );
 }
