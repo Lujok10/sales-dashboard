@@ -1,7 +1,7 @@
 
 import axios from "axios";
 
-const api = axios.create({ baseURL: "https://plankton-app-wycb9.ondigitalocean.app/api" });
+const api = axios.create({ baseURL: "https://plankton-app-wycb9.ondigitalocean.app/api, REACT_APP_API_URL=http://localhost:9001/api" });
 
 api.interceptors.request.use((config) => {
   config.headers["X-User-Role"] = localStorage.getItem("role");
